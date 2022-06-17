@@ -5,7 +5,7 @@ import image from '../images/home.jpeg';
 import logo from '../images/logo.jpeg';
 import styled from "@emotion/styled";
 import { GENERICS } from "../components/GlobalStyle";
-import { useNavigate } from "react-router-dom";
+import {Link, useNavigate} from "react-router-dom";
 
 export function Login() {
     const navigate = useNavigate();
@@ -78,6 +78,9 @@ export function Login() {
                                 {loading ? '...' : 'Login' }
                             </button>
                         </div>
+                        <p>
+                            Didn't sign up yet? <Link to='/signup'>Sign Up</Link>
+                        </p>
                     </form>
                 </div>
             </FormWrapper>
@@ -145,6 +148,13 @@ const FormWrapper = styled('div')`
       
       .error-message {
         color: red;
+      }
+      
+      p {
+        font-size: 12px;
+        a {
+          color: ${GENERICS.primaryColor}
+        }
       }
     }
   }

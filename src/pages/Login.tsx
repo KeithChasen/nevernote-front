@@ -14,7 +14,7 @@ export function Login() {
         password: ''
     })
 
-    const [submitLogin, { error }] = useLoginMutation()
+    const [submitLogin, { error, loading }] = useLoginMutation()
 
     const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -26,7 +26,7 @@ export function Login() {
             });
             navigate('/');
         } catch (e) {
-            console.error(e)
+            // console.error(e)
         }
     }
 
@@ -63,10 +63,20 @@ export function Login() {
                             />
                         </div>
 
-                        { error && <div>{JSON.stringify(error.message)}</div> }
+                        { error && error
+                            .graphQLErrors
+                            .map(({ message }, i) =>
+                                <div key={i}>
+                                    <small className='error-message'>
+                                        { message }
+                                    </small>
+                                </div>)
+                        }
 
                         <div>
-                            <button>Login</button>
+                            <button disabled={loading}>
+                                {loading ? '...' : 'Login' }
+                            </button>
                         </div>
                     </form>
                 </div>
@@ -131,6 +141,10 @@ const FormWrapper = styled('div')`
           color: white;
           border-radius: 5px;
         }
+      }
+      
+      .error-message {
+        color: red;
       }
     }
   }

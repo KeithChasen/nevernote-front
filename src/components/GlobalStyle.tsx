@@ -37,7 +37,7 @@ export const MIXINS = {
     va: (align = "center") => css`
       display: flex;
       align-items: center;
-      ${align !== 'center' ? "justify-content: flex-start;" : "justify-content: center;"}
+      ${align !== 'center' ? `justify-content: ${align};` : "justify-content: center;"}
     `
 }
 

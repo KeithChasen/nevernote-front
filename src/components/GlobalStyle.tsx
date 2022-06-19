@@ -28,7 +28,8 @@ export const GENERICS = {
     primaryColor: '#00a82d',
     primaryColorDark: '#008f26',
     border: '1px solid #f1f1f1',
-    colorBlackCalm: "#333",
+    colorBlack: "#222",
+    colorBlackCalm: "#444",
     colorGrey: "#737373",
     boxShadow: '#ccc 0px 4px 5px -2px'
 };

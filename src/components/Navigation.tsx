@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import { FaChevronDown, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaSignOutAlt } from 'react-icons/fa';
 
 export function Navigation() {
     return (
@@ -13,6 +13,10 @@ export function Navigation() {
                   <FaSignOutAlt />
                 </span>
             </div>
+            <div className="search-container">
+                <FaSearch />
+                <input placeholder="Search"/>
+            </div>
         </NavigationStyled>
     );
 }
@@ -21,8 +25,8 @@ const NavigationStyled = styled.div`
   width: 100%;
   height: 100%;
   max-width: 300px;
-  background: ${GENERICS.colorBlackCalm};
-  color: #f3f3f3;
+  background: ${GENERICS.colorBlack};
+  color: #ccc;
   
   .user-profile {
     display: grid;
@@ -54,5 +58,23 @@ const NavigationStyled = styled.div`
         color: red;
       }
     }
+  }
+  
+  .search-container {
+      display: flex;
+      align-items: center;
+      background: ${GENERICS.colorBlackCalm};
+      border-radius: 30px;
+      padding: 10px 20px;
+      margin: 0 20px;
+      
+      > input {
+        color: #ccc;
+        background: transparent;
+        border: none;
+        outline: none;
+        margin-left: 10px;
+        font-size: 16px;
+      }
   }
 `;

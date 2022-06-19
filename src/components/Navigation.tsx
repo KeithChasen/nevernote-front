@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import { FaSearch, FaSignOutAlt, FaPlus } from 'react-icons/fa';
+import { FaSearch, FaSignOutAlt, FaPlus, FaBook } from 'react-icons/fa';
 
 export function Navigation() {
     return (
@@ -21,6 +21,12 @@ export function Navigation() {
                 <FaPlus />
                 <span>New Note</span>
             </div>
+            <ul className="navs-menu">
+                <li>
+                    <FaBook />
+                    <span>All Notes</span>
+                </li>
+            </ul>
         </NavigationStyled>
     );
 }
@@ -68,7 +74,7 @@ const NavigationStyled = styled.div`
       ${MIXINS.va()}
       background: ${GENERICS.colorBlackCalm};
       border-radius: 30px;
-      padding: 10px 5px;
+      padding: 10px;
       margin: 0 20px;
       margin-bottom: 10px;
       
@@ -94,6 +100,26 @@ const NavigationStyled = styled.div`
     
     &:hover {
       background: ${GENERICS.primaryColorDark}
+    }
+  }
+  
+  .active {
+    background: #444;
+  }
+  
+  .navs-menu {
+    margin-top: 30px;
+    
+    > li {
+      padding: 10px 55px;
+      width: 100%;
+      gap: 10px;
+      ${MIXINS.va('left')}
+      cursor: pointer;
+      
+      &:hover {
+        background: #333;
+      }
     }
   }
 `;

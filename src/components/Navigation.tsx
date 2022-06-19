@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import { FaSearch, FaSignOutAlt } from 'react-icons/fa';
+import { FaSearch, FaSignOutAlt, FaPlus } from 'react-icons/fa';
 
 export function Navigation() {
     return (
@@ -16,6 +16,10 @@ export function Navigation() {
             <div className="search-container">
                 <FaSearch />
                 <input placeholder="Search"/>
+            </div>
+            <div className="newnote-button">
+                <FaPlus />
+                <span>New Note</span>
             </div>
         </NavigationStyled>
     );
@@ -61,12 +65,12 @@ const NavigationStyled = styled.div`
   }
   
   .search-container {
-      display: flex;
-      align-items: center;
+      ${MIXINS.va()}
       background: ${GENERICS.colorBlackCalm};
       border-radius: 30px;
-      padding: 10px 20px;
+      padding: 10px 5px;
       margin: 0 20px;
+      margin-bottom: 10px;
       
       > input {
         color: #ccc;
@@ -76,5 +80,20 @@ const NavigationStyled = styled.div`
         margin-left: 10px;
         font-size: 16px;
       }
+  }
+  
+  .newnote-button {
+    ${MIXINS.va('left')}
+    gap: 10px;
+    color: white;
+    background: ${GENERICS.primaryColor};
+    border-radius: 30px;
+    padding: 10px 35px;
+    margin: 0 20px;
+    cursor: pointer;
+    
+    &:hover {
+      background: ${GENERICS.primaryColorDark}
+    }
   }
 `;

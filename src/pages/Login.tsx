@@ -6,6 +6,7 @@ import logo from '../images/logo.jpeg';
 import styled from "@emotion/styled";
 import { GENERICS } from "../components/GlobalStyle";
 import {Link, useNavigate} from "react-router-dom";
+import {saveToken} from "../helper/auth";
 
 export function Login() {
     const navigate = useNavigate();
@@ -19,11 +20,12 @@ export function Login() {
     const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         try {
-            await submitLogin({
+            const data = await submitLogin({
                 variables: {
                     ...form
                 }
             });
+            saveToken(data.data?.login.access_token!);
             navigate('/');
         } catch (e) {
             // console.error(e)

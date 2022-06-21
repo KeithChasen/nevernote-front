@@ -1,12 +1,18 @@
 import React from 'react';
-import {Wrapper} from "../components/Wrapper";
-import {Navigation} from "../components/Navigation";
+import { Wrapper } from "../components/Wrapper";
+import { Navigation } from "../components/Navigation";
+import { ListNotes } from "../components/ListNotes";
+import styled from "@emotion/styled";
 
 export function Home() {
     return (
-        <Wrapper>
+        <HomeStyled>
             <Navigation />
-            <h1>HOME PAGE</h1>
-        </Wrapper>
+            <ListNotes />
+        </HomeStyled>
     );
 }
+
+const HomeStyled = styled(Wrapper)`
+  display: flex;
+`;

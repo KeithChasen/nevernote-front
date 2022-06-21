@@ -11,5 +11,5 @@ const WrapperStyled = styled.div`
   
   ${(props: any ) => (props.center ? MIXINS.va() : '')}
   
-  background: ${(props: any) => props.backgroundColor ? props.backgroundColor : 'unset'}
+  background: ${(props: any) => props.backgroundColor ? props.backgroundColor : 'unset;'}
 `;

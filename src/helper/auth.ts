@@ -4,6 +4,7 @@ import jwtDecode, { JwtPayload } from "jwt-decode";
 const TOKEN = 'nevernote-token';
 export const saveToken = (token: string) => storage.setItem(TOKEN, token);
 export const getToken = (): string | null => storage.getItem(TOKEN);
+export const clearToken = () => storage.removeItem(TOKEN);
 
 export const isAuth = (): boolean => {
   const token = getToken();

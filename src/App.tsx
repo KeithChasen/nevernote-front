@@ -18,8 +18,16 @@ function App() {
         <GlobalStyles />
         <Layout>
             <Routes>
-                <Route path='login' element={<Login />}/>
-                <Route path='signup' element={<Signup />}/>
+                <Route path='login' element={
+                    <UnAuthRoute>
+                        <Login />
+                    </UnAuthRoute>
+                } />
+                <Route path='signup' element={
+                    <UnAuthRoute>
+                        <Signup />
+                    </UnAuthRoute>
+                } />
                 <Route index element={
                     <AuthRoute>
                         <Home />
@@ -35,6 +43,13 @@ const AuthRoute = ({ children }: any) => {
         return children
     }
     return <Navigate to='/login' />
+}
+
+const UnAuthRoute = ({ children }: any) => {
+    if (isAuth()) {
+        return <Navigate to='/' />
+    }
+    return children;
 }
 
 export default App;

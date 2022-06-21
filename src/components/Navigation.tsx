@@ -1,15 +1,33 @@
 import React from 'react';
 import styled from "@emotion/styled";
-import {GENERICS, MIXINS} from "./GlobalStyle";
+import { GENERICS, MIXINS } from "./GlobalStyle";
 import { FaSearch, FaSignOutAlt, FaPlus, FaBook } from 'react-icons/fa';
+import { useLogoutMutation } from "../generated/graphql";
+import { useNavigate } from "react-router-dom";
+import {clearToken} from "../helper/auth";
 
 export function Navigation() {
+    const [submitLogout, { client }] = useLogoutMutation();
+
+    const navigate = useNavigate();
+
+    const onLogoutHandler = async () => {
+        try {
+            await submitLogout();
+            await client.resetStore();
+            clearToken();
+            navigate('/');
+        } catch (e) {
+            console.log(e);
+        }
+    }
+
     return (
         <NavigationStyled>
             <div className='user-profile'>
                 <div>N</div>
                 <span>Name</span>
-                <span>
+                <span onClick={onLogoutHandler}>
                   <FaSignOutAlt />
                 </span>
             </div>

@@ -2,12 +2,13 @@ import React from 'react';
 import styled from "@emotion/styled";
 import { GENERICS, MIXINS } from "./GlobalStyle";
 import { FaSearch, FaSignOutAlt, FaPlus, FaBook } from 'react-icons/fa';
-import { useLogoutMutation } from "../generated/graphql";
+import {useLogoutMutation, useMeQuery} from "../generated/graphql";
 import { useNavigate } from "react-router-dom";
 import {clearToken} from "../helper/auth";
 
 export function Navigation() {
     const [submitLogout, { client }] = useLogoutMutation();
+    const { data } = useMeQuery();
 
     const navigate = useNavigate();
 
@@ -25,8 +26,8 @@ export function Navigation() {
     return (
         <NavigationStyled>
             <div className='user-profile'>
-                <div>N</div>
-                <span>Name</span>
+                <div>{data?.me?.username.substr(0,1).toUpperCase()}</div>
+                <span>{data?.me?.username}</span>
                 <span onClick={onLogoutHandler}>
                   <FaSignOutAlt />
                 </span>

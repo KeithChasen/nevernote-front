@@ -72,7 +72,7 @@ const NavigationStyled = styled.div`
       ${MIXINS.va()}
     }
     
-    > span:nth-child(2) {
+    > span:nth-of-type(1) {
       white-space: nowrap;
     } 
     

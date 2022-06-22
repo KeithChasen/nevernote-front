@@ -1,12 +1,15 @@
 import React, {ChangeEvent, Fragment, useEffect, useState} from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import {Note, useListNotesQuery} from "../generated/graphql";
+import {ListNotesDocument, Note, useListNotesQuery, useUpdateNoteMutation} from "../generated/graphql";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { FaSort } from 'react-icons/fa'
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
+import {debounce} from "../helper/debounce";
+import { stripHtml } from "string-strip-html";
+import {stripText} from "../helper/stripText";
 
 dayjs.extend(relativeTime);
 
@@ -21,6 +24,11 @@ export function ListNotes() {
         content: ''
     });
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+    const [submitUpdateNote] = useUpdateNoteMutation();
+
+    useEffect(() => {
+        onUpdateNoteHandler();
+    },[noteForm])
 
     const onChangeEditorHandler = (value: string) =>
         setNoteForm(prevNote => ({...prevNote, content: value}));
@@ -28,9 +36,33 @@ export function ListNotes() {
     const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) =>
         setNoteForm({...noteForm, title: e.target.value});
 
-    useEffect(() => {
-        console.log(noteForm)
-    }, [noteForm]);
+    const onUpdateNoteHandler = debounce(async () => {
+        if (!selectedNote) return;
+        try {
+            await submitUpdateNote({
+                variables: {
+                    title: noteForm.title,
+                    content: noteForm.content,
+                    noteId: selectedNote.id
+                },
+                update: (store, newNote) => {
+                    store.writeQuery({
+                        query: ListNotesDocument,
+                        data: {
+                            listNotes: data?.listNotes.map((note) => {
+                                if (note.id === selectedNote.id) {
+                                    return newNote
+                                }
+                                return note
+                            })
+                        }
+                    })
+                }
+            });
+        } catch (e) {
+
+        }
+    });
 
     const onSelect = (note: Note) => () => {
         setSelectedNote(note);
@@ -58,7 +90,7 @@ export function ListNotes() {
                             onClick={onSelect(note as any)}
                         >
                             <div className='note-title'>{note.title || 'Title'}</div>
-                            <div>{note.content || 'Content'}</div>
+                            <div>{stripText(stripHtml(note.content).result) || 'Content'}</div>
                             <small>{dayjs(note.created_at).fromNow()}</small>
                         </div>
                     ))}
@@ -104,6 +136,7 @@ const ListNotesStyle = styled.div`
       .active {
         background: #fff;
       }
+      
       .note {
         padding: 20px;
         border-bottom: ${GENERICS.border};

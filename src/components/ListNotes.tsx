@@ -30,12 +30,17 @@ export function ListNotes() {
         content: ''
     });
 
+    const [isSaving, setIsSaving] = useState(false);
+
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
     const [submitUpdateNote] = useUpdateNoteMutation();
     const [submitDeleteNote] = useDeleteNoteMutation();
 
     useEffect(() => {
+        setTimeout(() => {
+            setIsSaving(true);
+        }, 1500);
         onUpdateNoteHandler();
     },[noteForm])
 
@@ -68,6 +73,7 @@ export function ListNotes() {
                     })
                 }
             });
+            setIsSaving(false);
         } catch (e) {
 
         }
@@ -143,6 +149,12 @@ export function ListNotes() {
                     disabled={!selectedNote}
                     onChange={onChangeTitleHandler}
                 />
+                {
+                    isSaving &&
+                    <div className='saving-text'>
+                        <small>saving...</small>
+                    </div>
+                }
                 <ReactQuill
                     value={noteForm.content}
                     readOnly={!selectedNote}
@@ -235,6 +247,11 @@ const EditorContainer = styled.div<EditorProps>`
         background: transparent;
         cursor: not-allowed;
       }
+    }
+    
+    .saving-text {
+      padding: 0 18px;
+      font-style: italic;
     }
     
     .ql-toolbar, .ql-container {

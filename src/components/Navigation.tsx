@@ -2,13 +2,19 @@ import React from 'react';
 import styled from "@emotion/styled";
 import { GENERICS, MIXINS } from "./GlobalStyle";
 import { FaSearch, FaSignOutAlt, FaPlus, FaBook } from 'react-icons/fa';
-import {useLogoutMutation, useMeQuery} from "../generated/graphql";
+import {
+    ListNotesDocument,
+    useAddNoteMutation,
+    useLogoutMutation,
+    useMeQuery
+} from "../generated/graphql";
 import { useNavigate } from "react-router-dom";
-import {clearToken} from "../helper/auth";
+import { clearToken } from "../helper/auth";
 
 export function Navigation() {
     const [submitLogout, { client }] = useLogoutMutation();
     const { data } = useMeQuery();
+    const [submitAddNote] = useAddNoteMutation();
 
     const navigate = useNavigate();
 
@@ -20,6 +26,26 @@ export function Navigation() {
             navigate('/');
         } catch (e) {
             console.log(e);
+        }
+    }
+
+    const onAddNoteHandler = async () => {
+        try {
+            const note = await submitAddNote({
+                variables: {
+                    content: 'Content',
+                    title: 'Title'
+                }
+            });
+            const { listNotes } = client.readQuery({ query: ListNotesDocument});
+            client.writeQuery({
+                query: ListNotesDocument,
+                data: {
+                    listNotes: [note.data?.addNote, ...listNotes]
+                }
+            })
+        } catch (e) {
+            console.log(e)
         }
     }
 
@@ -36,7 +62,7 @@ export function Navigation() {
                 <FaSearch />
                 <input placeholder="Search"/>
             </div>
-            <div className="newnote-button">
+            <div className="newnote-button" onClick={onAddNoteHandler}>
                 <FaPlus />
                 <span>New Note</span>
             </div>

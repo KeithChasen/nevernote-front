@@ -57,8 +57,8 @@ export function ListNotes() {
                             className={`note${selectedNote?.id == note.id ? ' active' : ''}`}
                             onClick={onSelect(note as any)}
                         >
-                            <div className='note-title'>{note.title}</div>
-                            <div>{note.content}</div>
+                            <div className='note-title'>{note.title || 'Title'}</div>
+                            <div>{note.content || 'Content'}</div>
                             <small>{dayjs(note.created_at).fromNow()}</small>
                         </div>
                     ))}

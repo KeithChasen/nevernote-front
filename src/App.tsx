@@ -10,33 +10,40 @@ import { Signup } from "./pages/Signup";
 import { Home } from "./pages/Home";
 import { GlobalStyles } from "./components/GlobalStyle";
 import {Layout} from "./components/Layout";
-import {isAuth} from "./helper/auth";
+import {isAuth, usePrepareApp} from "./helper/auth";
+import Loading from "./components/Loading";
 
 function App() {
-  return (
-    <BrowserRouter>
-        <GlobalStyles />
-        <Layout>
-            <Routes>
-                <Route path='login' element={
-                    <UnAuthRoute>
-                        <Login />
-                    </UnAuthRoute>
-                } />
-                <Route path='signup' element={
-                    <UnAuthRoute>
-                        <Signup />
-                    </UnAuthRoute>
-                } />
-                <Route index element={
-                    <AuthRoute>
-                        <Home />
-                    </AuthRoute>
-                } />
-            </Routes>
-        </Layout>
-    </BrowserRouter>
-  );
+    const { isLoading } = usePrepareApp();
+
+    if (isLoading) {
+        return <Loading />
+    }
+
+    return (
+        <BrowserRouter>
+            <GlobalStyles />
+            <Layout>
+                <Routes>
+                    <Route path='login' element={
+                        <UnAuthRoute>
+                            <Login />
+                        </UnAuthRoute>
+                    } />
+                    <Route path='signup' element={
+                        <UnAuthRoute>
+                            <Signup />
+                        </UnAuthRoute>
+                    } />
+                    <Route index element={
+                        <AuthRoute>
+                            <Home />
+                        </AuthRoute>
+                    } />
+                </Routes>
+            </Layout>
+        </BrowserRouter>
+    );
 }
 const AuthRoute = ({ children }: any) => {
     if (isAuth()) {

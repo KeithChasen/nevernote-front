@@ -1,10 +1,16 @@
 import React, {ChangeEvent, Fragment, useEffect, useState} from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import {ListNotesDocument, Note, useListNotesQuery, useUpdateNoteMutation} from "../generated/graphql";
+import {
+    ListNotesDocument,
+    Note,
+    useDeleteNoteMutation,
+    useListNotesQuery,
+    useUpdateNoteMutation
+} from "../generated/graphql";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { FaSort } from 'react-icons/fa'
+import { FaSort, FaTrash } from 'react-icons/fa'
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import {debounce} from "../helper/debounce";
@@ -23,8 +29,11 @@ export function ListNotes() {
         title: '',
         content: ''
     });
+
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
     const [submitUpdateNote] = useUpdateNoteMutation();
+    const [submitDeleteNote] = useDeleteNoteMutation();
 
     useEffect(() => {
         onUpdateNoteHandler();
@@ -64,6 +73,30 @@ export function ListNotes() {
         }
     });
 
+    const onDeleteNoteHandler = (note: Note) => async () => {
+        if (window.confirm("Are you sure")) {
+            try {
+                await submitDeleteNote({
+                    variables: {
+                        noteId: note.id
+                    },
+                    update: (store) => {
+                        store.writeQuery({
+                            query: ListNotesDocument,
+                            data: {
+                                listNotes: data?.listNotes.filter(({ id }) =>
+                                    id !== note.id
+                                )
+                            }
+                        })
+                    }
+                })
+            } catch (e) {
+                console.log(e)
+            }
+        }
+    }
+
     const onSelect = (note: Note) => () => {
         setSelectedNote(note);
         setNoteForm({
@@ -71,7 +104,6 @@ export function ListNotes() {
             content: note.content
         });
     }
-
     return (
         <Fragment>
             <ListNotesStyle>
@@ -89,9 +121,17 @@ export function ListNotes() {
                             className={`note${selectedNote?.id == note.id ? ' active' : ''}`}
                             onClick={onSelect(note as any)}
                         >
-                            <div className='note-title'>{note.title || 'Title'}</div>
-                            <div>{stripText(stripHtml(note.content).result) || 'Content'}</div>
-                            <small>{dayjs(note.created_at).fromNow()}</small>
+                            <div className="note-detail">
+                                <div className='note-title'>{note.title || 'Title'}</div>
+                                <div>{stripText(stripHtml(note.content).result) || 'Content'}</div>
+                                <small>{dayjs(note.created_at).fromNow()}</small>
+                            </div>
+                            <div
+                                className='delete-btn'
+                                onClick={onDeleteNoteHandler(note as any)}
+                            >
+                                <FaTrash />
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -113,6 +153,7 @@ export function ListNotes() {
             </EditorContainer>
         </Fragment>
     )
+
 }
 
 const ListNotesStyle = styled.div`
@@ -120,40 +161,56 @@ const ListNotesStyle = styled.div`
   width: 100%;
   max-width: 350px;
   color: ${GENERICS.colorBlackCalm};
-  background: ${GENERICS.bgColor};
-  
+  background-color: ${GENERICS.bgColor};
+  display: flex;
+  flex-direction: column;
   > h2 {
     font-weight: normal;
     padding: 20px;
   }
-  
   .note-filter {
-    ${MIXINS.va('space-between')}
+    ${MIXINS.va("space-between")}
     padding: 15px 20px;
-    border-bottom 1px solid #ccc;
-    
-    .list-notes {
-      .active {
-        background: #fff;
+    border-bottom: 1px solid #ccc;
+    .filters span {
+      cursor: pointer;
+      padding: 3px;
+    }
+  }
+  .list-notes {
+    overflow-y: auto;
+    height: 100%;
+    .active {
+      background-color: #fff;
+    }
+    .note {
+      cursor: pointer;
+      padding: 20px;
+      border-bottom: ${GENERICS.border};
+      color: ${GENERICS.colorGrey};
+      ${MIXINS.va("space-between")}
+      &:hover {
+        background-color: #eee;
+        .delete-btn {
+          visibility: visible;
+        }
       }
-      
-      .note {
-        padding: 20px;
-        border-bottom: ${GENERICS.border};
-        color: ${GENERICS.colorGrey};
-        cursor: pointer;
-        
-        &:hover {
-          background: #eee;
-        }
-        
+      .note-detail {
         > div {
-          margin-bottom: 5px;
+          margin-bottom: 8px;
         }
-        
         .note-title {
           color: ${GENERICS.colorBlackCalm};
           font-weight: bold;
+        }
+      }
+      .delete-btn {
+        visibility: hidden;
+        cursor: pointer;
+        padding: 5px;
+        &:hover {
+          transition: 0.3s;
+          color: red;
         }
       }
     }

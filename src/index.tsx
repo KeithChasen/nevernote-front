@@ -14,7 +14,7 @@ import { setContext } from "@apollo/client/link/context";
 import {getToken, isAuth, saveToken} from "./helper/auth";
 import { TokenRefreshLink } from "apollo-link-token-refresh";
 
-const EXPRESS_URL = 'http://localhost:4000';
+export const EXPRESS_URL = 'http://localhost:4000';
 const GRAPHQL_URL = `${EXPRESS_URL}/graphql`;
 
 const refreshLink =

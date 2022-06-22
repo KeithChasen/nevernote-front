@@ -1,7 +1,7 @@
-import React, {Fragment, useState} from 'react';
+import React, {ChangeEvent, Fragment, useEffect, useState} from 'react';
 import styled from "@emotion/styled";
 import {GENERICS, MIXINS} from "./GlobalStyle";
-import { useListNotesQuery } from "../generated/graphql";
+import {Note, useListNotesQuery} from "../generated/graphql";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
 import { FaSort } from 'react-icons/fa'
@@ -10,9 +10,36 @@ import 'react-quill/dist/quill.snow.css';
 
 dayjs.extend(relativeTime);
 
+interface EditorProps {
+    disabled: boolean
+}
+
 export function ListNotes() {
     const { data, error } = useListNotesQuery();
-    const [value, setValue] = useState("");
+    const [noteForm, setNoteForm] = useState({
+        title: '',
+        content: ''
+    });
+    const [selectedNote, setSelectedNote] = useState<Note | null>(null);
+
+    const onChangeEditorHandler = (value: string) =>
+        setNoteForm(prevNote => ({...prevNote, content: value}));
+
+    const onChangeTitleHandler = (e: ChangeEvent<HTMLInputElement>) =>
+        setNoteForm({...noteForm, title: e.target.value});
+
+    useEffect(() => {
+        console.log(noteForm)
+    }, [noteForm]);
+
+    const onSelect = (note: Note) => () => {
+        setSelectedNote(note);
+        setNoteForm({
+            title: note.title,
+            content: note.content
+        });
+    }
+
     return (
         <Fragment>
             <ListNotesStyle>
@@ -24,8 +51,12 @@ export function ListNotes() {
                     </div>
                 </div>
                 <div className="list-notes">
-                    {data?.listNotes.map((note, i) => (
-                        <div className={`note${i == 1 ? ' active' : ''}`}>
+                    {data?.listNotes.map(note => (
+                        <div
+                            key={note.id}
+                            className={`note${selectedNote?.id == note.id ? ' active' : ''}`}
+                            onClick={onSelect(note as any)}
+                        >
                             <div className='note-title'>{note.title}</div>
                             <div>{note.content}</div>
                             <small>{dayjs(note.created_at).fromNow()}</small>
@@ -33,9 +64,20 @@ export function ListNotes() {
                     ))}
                 </div>
             </ListNotesStyle>
-            <EditorContainer>
-                <input placeholder='title' />
-                <ReactQuill readOnly={true} theme='snow' placeholder="Start writing here..." />
+            <EditorContainer disabled={!selectedNote}>
+                <input
+                    value={noteForm.title}
+                    placeholder='title'
+                    disabled={!selectedNote}
+                    onChange={onChangeTitleHandler}
+                />
+                <ReactQuill
+                    value={noteForm.content}
+                    readOnly={!selectedNote}
+                    theme='snow'
+                    placeholder="Start writing here..."
+                    onChange={onChangeEditorHandler}
+                />
             </EditorContainer>
         </Fragment>
     )
@@ -85,7 +127,7 @@ const ListNotesStyle = styled.div`
   }
 `;
 
-const EditorContainer = styled.div`
+const EditorContainer = styled.div<EditorProps>`
     width: 100%;
     
     .quill > .ql-toolbar:first-child {
@@ -98,6 +140,11 @@ const EditorContainer = styled.div`
       padding: 15px;
       font-size: 2em;
       width: 100%;
+      
+      &:disabled {
+        background: transparent;
+        cursor: not-allowed;
+      }
     }
     
     .ql-toolbar, .ql-container {
@@ -107,5 +154,11 @@ const EditorContainer = styled.div`
     .quill, .ql-container {
       font-size: 1em;
       height: 100%;
+      cursor: ${(props: any) => (props.disabled ? 'not-allowed;' : 'unset;')}
+    }
+    
+    .ql-toolbar,
+    .ql-editor {
+      cursor: ${(props: any) => (props.disabled ? 'not-allowed;' : 'unset;')}
     }
 `;

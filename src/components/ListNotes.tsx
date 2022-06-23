@@ -10,7 +10,11 @@ import {
 } from "../generated/graphql";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { FaSort, FaTrash } from 'react-icons/fa'
+import {
+    FaSortDown,
+    FaSortUp,
+    FaTrash
+} from 'react-icons/fa'
 import ReactQuill from "react-quill";
 import 'react-quill/dist/quill.snow.css';
 import {debounce} from "../helper/debounce";
@@ -23,14 +27,17 @@ interface EditorProps {
     disabled: boolean
 }
 
+type OrderByType = 'ASC' | 'DESC';
+
 export function ListNotes() {
-    const { data, error } = useListNotesQuery();
+    const { data, error, refetch } = useListNotesQuery();
     const [noteForm, setNoteForm] = useState({
         title: '',
         content: ''
     });
 
     const [isSaving, setIsSaving] = useState(false);
+    const [orderBy, setOrderBy] = useState<OrderByType>('DESC');
 
     const [selectedNote, setSelectedNote] = useState<Note | null>(null);
 
@@ -113,6 +120,13 @@ export function ListNotes() {
             content: note.content
         });
     }
+
+    const onSort = async () => {
+        const newOrderBy = orderBy === 'ASC' ? 'DESC' : 'ASC';
+        await refetch({ orderBy: newOrderBy });
+        setOrderBy(newOrderBy);
+    }
+
     return (
         <Fragment>
             <ListNotesStyle>
@@ -120,7 +134,9 @@ export function ListNotes() {
                 <div className='note-filter'>
                     <span>{data?.listNotes.length} Notes</span>
                     <div className='filters'>
-                        <span><FaSort /></span>
+                        <span onClick={onSort}>
+                            { orderBy === 'ASC' ? <FaSortDown/> : <FaSortUp/> }
+                        </span>
                     </div>
                 </div>
                 <div className="list-notes">
@@ -133,7 +149,7 @@ export function ListNotes() {
                             <div className="note-detail">
                                 <div className='note-title'>{note.title || 'Title'}</div>
                                 <div>{stripText(stripHtml(note.content).result) || 'Content'}</div>
-                                <small>{dayjs(note.created_at).fromNow()}</small>
+                                <small>{dayjs(parseInt(note.created_at)).fromNow()}</small>
                             </div>
                             <div
                                 className='delete-btn'

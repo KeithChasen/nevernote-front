@@ -6,6 +6,7 @@ import logo from '../images/logo.jpeg';
 import styled from "@emotion/styled";
 import { GENERICS } from "../components/GlobalStyle";
 import { useNavigate, Link } from "react-router-dom";
+import {useRequired} from "../helper/hooks";
 
 export function Signup() {
     const navigate = useNavigate();
@@ -15,6 +16,7 @@ export function Signup() {
     })
 
     const [submitSignUp, { error, loading }] = useSignupMutation()
+    const { isValid } = useRequired(form);
 
     const onSubmitHandler = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
@@ -75,7 +77,7 @@ export function Signup() {
                         }
 
                         <div>
-                            <button disabled={loading}>
+                            <button disabled={!isValid || loading}>
                                 {loading ? '...' : 'Sign Up' }
                             </button>
                         </div>
@@ -144,6 +146,10 @@ const FormWrapper = styled('div')`
           padding: 5px 10px;
           color: white;
           border-radius: 5px;
+          
+          &:disabled {
+            background: #ccc;
+          }
         }
       }
       

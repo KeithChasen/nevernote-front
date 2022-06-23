@@ -38,6 +38,7 @@ export const usePrepareApp = () => {
               } else {
                   clearToken();
                   resetStore();
+                  setIsLoading(false);
               }
           })
   },[]);

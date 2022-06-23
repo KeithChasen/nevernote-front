@@ -1,20 +1,29 @@
-import React from 'react';
+import React, {useEffect, useState} from 'react';
 import styled from "@emotion/styled";
 import { GENERICS, MIXINS } from "./GlobalStyle";
-import { FaSearch, FaSignOutAlt, FaPlus, FaBook } from 'react-icons/fa';
+import {
+    FaSearch,
+    FaSignOutAlt,
+    FaPlus,
+    FaBook
+} from 'react-icons/fa';
 import {
     ListNotesDocument,
     useAddNoteMutation,
+    useListNotesQuery,
     useLogoutMutation,
     useMeQuery
 } from "../generated/graphql";
 import { useNavigate } from "react-router-dom";
 import { clearToken } from "../helper/auth";
+import { debounce } from "../helper/debounce";
 
 export function Navigation() {
     const [submitLogout, { client }] = useLogoutMutation();
     const { data } = useMeQuery();
     const [submitAddNote] = useAddNoteMutation();
+    const [searchText, setSearchText] = useState('');
+    const { refetch } = useListNotesQuery();
 
     const navigate = useNavigate();
 
@@ -49,6 +58,24 @@ export function Navigation() {
         }
     }
 
+    const onSearchHandler = debounce( async () => {
+        await refetch({
+            search: searchText
+        })
+            .then(({ data: { listNotes }}) => {
+                client.writeQuery({
+                    query: ListNotesDocument,
+                    data: {
+                        listNotes
+                    }
+                })
+            })
+    }, 1000);
+
+    useEffect(() => {
+        onSearchHandler();
+    }, [searchText]);
+
     return (
         <NavigationStyled>
             <div className='user-profile'>
@@ -60,7 +87,11 @@ export function Navigation() {
             </div>
             <div className="search-container">
                 <FaSearch />
-                <input placeholder="Search"/>
+                <input
+                    placeholder="Search"
+                    value={searchText}
+                    onChange={({ target }) => setSearchText(target.value)}
+                />
             </div>
             <div className="newnote-button" onClick={onAddNoteHandler}>
                 <FaPlus />

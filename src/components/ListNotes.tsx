@@ -38,9 +38,12 @@ export function ListNotes() {
     const [submitDeleteNote] = useDeleteNoteMutation();
 
     useEffect(() => {
-        setTimeout(() => {
-            setIsSaving(true);
-        }, 1500);
+        if (selectedNote) {
+            setTimeout(() => {
+                setIsSaving(true);
+            }, 1500);
+        }
+
         onUpdateNoteHandler();
     },[noteForm])
 
